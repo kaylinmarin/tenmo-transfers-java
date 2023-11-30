@@ -37,5 +37,18 @@ public class AccountController {
         return account;
     }
 
+    //ADDED FOR RETURNING A BALANCE
+    @RequestMapping(path="/accountByUserId/{userId}", method = RequestMethod.GET)
+    public Account getAccountByUserId(@PathVariable int userId){
+        Account account= accountDao.getAccountByUserId(userId);
+
+        if(account == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "This user does not exist");
+
+        }else{
+            return accountDao.getAccountByUserId(userId);
+        }
+    }
+
 }
 

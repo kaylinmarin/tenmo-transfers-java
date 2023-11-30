@@ -86,10 +86,19 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
 
-	}
+    //JILL EDITED THIS
+	private void viewCurrentBalance() {
+        int userId = currentUser.getUser().getId();
+        accountService.setAuthToken(currentUser.getToken());
+        Account account = accountService.getAccountByUserId(userId);
+        System.out.println("The current balance is : $" + account.getBalance());
+
+
+    // TODO Auto-generated method stub
+
+}
+
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub

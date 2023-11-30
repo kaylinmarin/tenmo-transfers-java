@@ -2,10 +2,14 @@ package com.techelevator.tenmo.dao;
 
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.Account;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class JdbcAccountDao implements AccountDao {
@@ -30,6 +34,7 @@ public class JdbcAccountDao implements AccountDao {
         return account;
 
     }
+    //this probably needs to go in userController. Still working it out
     public Account getAccountByUserId(int user_id) {
         Account account = null;
         String sql = "SELECT account_id, user_id, balance " +
@@ -44,6 +49,24 @@ public class JdbcAccountDao implements AccountDao {
         }
         return account;
     }
+
+    @Override
+    public List<Account> getAccounts() {
+        List<Account> accounts = new ArrayList<>();
+        String sql = "SELECT * FROM account";
+        try {
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+            while (results.next()) {
+                accounts.add(mapRowToAccount(results));
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return accounts;
+    }
+
     private Account mapRowToAccount(SqlRowSet rs) {
         Account account = new Account();
         account.setAccount_id(rs.getInt("account_id"));

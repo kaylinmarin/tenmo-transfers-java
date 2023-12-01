@@ -89,6 +89,7 @@ public class ConsoleService {
         System.out.println("An error occurred. Check the log for details.");
     }
     public void printUsers(User[] users) {
+        //ask austin about printing users without current user included
         if (users != null) {
             System.out.println("--------------------------");
             System.out.println("ID      User");
@@ -96,6 +97,7 @@ public class ConsoleService {
             for (User user : users) {
                 System.out.println(user.userToString());
             }
+            System.out.println(" ");
         }
     }
 }

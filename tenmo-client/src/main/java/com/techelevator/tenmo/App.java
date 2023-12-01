@@ -139,11 +139,11 @@ public class App {
              return;
          }
 
-         Transfer transfer = new Transfer();
-         transfer.setTypeId(2);
-         transfer.setFromUserId(currentUser.getUser().getId());
-         transfer.setToUserId(selection);
-         transfer.setAmount(amount);
+//         Transfer transfer = new Transfer();
+//         transfer.setTypeId(2);
+//         transfer.setFromUserId(currentUser.getUser().getId());
+//         transfer.setToUserId(selection);
+//         transfer.setAmount(amount);
 
 	}
 

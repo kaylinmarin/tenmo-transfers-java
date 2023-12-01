@@ -128,12 +128,12 @@ public class App {
          }
          //everything is catching here. Need to resolve grabbing account by user id
         //maybe I need account Id, not user id. to retrieve the account?
-         if (userService.getUserId(selection) == null) {
+         if (accountService.getAccountByUserId(selection) == null) {
            System.out.println("Invalid user id.");
            return;
          }
 
-         BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to send");
+         BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to send $");
          if (amount.compareTo(new BigDecimal("0")) == -1 || amount.compareTo(new BigDecimal("0")) == 0 ) {
              System.out.println("Invalid amount. Must be more than $0.00");
              return;
@@ -144,6 +144,9 @@ public class App {
          transfer.setFromUserId(currentUser.getUser().getId());
          transfer.setToUserId(selection);
          transfer.setAmount(amount);
+
+         //boolean if successful print approved
+         //if not, print rejected
 
 	}
 
@@ -162,7 +165,7 @@ public class App {
         }
         //everything is catching here. Need to resolve grabbing account by user id
         //maybe I need account Id, not user id. to retrieve the account?
-        if (userService.getUserId(selection) == null) {
+        if (accountService.getAccountByUserId(selection) == null) {
             System.out.println("Invalid user id.");
             return;
         }
@@ -180,5 +183,6 @@ public class App {
          transfer.setAmount(amount);
 
     }
+    //where to update account balances after transfer amount?
 
 }

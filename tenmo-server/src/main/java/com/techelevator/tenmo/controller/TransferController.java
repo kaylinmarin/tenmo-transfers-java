@@ -1,10 +1,13 @@
 package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/transfers")
@@ -15,7 +18,11 @@ public class TransferController {
     public TransferController(TransferDao transferDao) {
         this.transferDao = transferDao;
     }
-
+    @RequestMapping(method = RequestMethod.GET)
+    public List<Transfer> transferList() {
+        List<Transfer> transfers = transferDao.getTransfers();
+        return transfers;
+    }
     @RequestMapping(path = "{transferId}", method = RequestMethod.GET)
     public Transfer getTransferById(@PathVariable int transferId) {
         //gets transfer by transferId

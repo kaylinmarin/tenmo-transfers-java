@@ -18,10 +18,15 @@ public class User {
     public String getUsername() {
         return username;
     }
+    public String userToString() {
+        return id + "    " + username;
+    }
 
     public void setUsername(String username) {
         this.username = username;
     }
+
+
 
     @Override
     public boolean equals(Object other) {
@@ -38,4 +43,6 @@ public class User {
     public int hashCode() {
         return Objects.hash(id, username);
     }
+
+
 }

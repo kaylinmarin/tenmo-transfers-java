@@ -34,7 +34,7 @@ public class JdbcAccountDao implements AccountDao {
         return account;
 
     }
-    //this probably needs to go in userController. Still working it out
+
     public Account getAccountByUserId(int user_id) {
         Account account = null;
         String sql = "SELECT account_id, user_id, balance " +

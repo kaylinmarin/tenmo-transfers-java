@@ -152,9 +152,33 @@ public class App {
         User[] users = userService.getAllUsers();
         consoleService.printUsers(userService.getAllUsers());
 
-        
+        int selection = consoleService.promptForInt("Enter Id of user you would like to request from (Select 0 to cancel): ");
+        if (selection == 0) {
+            return;
+        }
+        if (selection == currentUser.getUser().getId()) {
+            System.out.println("Invalid selection: Cannot transfer to yourself.");
+            return;
+        }
+        //everything is catching here. Need to resolve grabbing account by user id
+        //maybe I need account Id, not user id. to retrieve the account?
+        if (userService.getUserId(selection) == null) {
+            System.out.println("Invalid user id.");
+            return;
+        }
 
-		
-	}
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to request");
+        if (amount.compareTo(new BigDecimal("0")) == -1 || amount.compareTo(new BigDecimal("0")) == 0 ) {
+            System.out.println("Invalid amount. Must be more than $0.00");
+            return;
+        }
+
+//         Transfer transfer = new Transfer();
+//         transfer.setTypeId(1);
+//         transfer.setToUserId(currentUser.getUser().getId());
+//         transfer.setFromUserId(selection);
+//         transfer.setAmount(amount);
+
+    }
 
 }

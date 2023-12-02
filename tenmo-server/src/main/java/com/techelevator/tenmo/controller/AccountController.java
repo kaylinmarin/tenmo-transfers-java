@@ -6,6 +6,7 @@ import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/accounts")
-//@PreAuthorize("isAuthenticated()")
+@PreAuthorize("isAuthenticated()")
 public class AccountController {
 
     private AccountDao accountDao;
@@ -35,7 +36,7 @@ public class AccountController {
         List<Account> accounts = accountDao.getAccounts();
         return accounts;
     }
-
+   // @PreAuthorize("hasRole('USER')")
     @RequestMapping(path = "{accountId}", method = RequestMethod.GET)
     public Account getAccountById(@PathVariable int accountId) {
         Account account = accountDao.getAccountById(accountId);

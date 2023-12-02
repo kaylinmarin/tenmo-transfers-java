@@ -1,6 +1,8 @@
 package com.techelevator.tenmo.controller;
 
+import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,15 +15,18 @@ import java.util.List;
 public class TransferController {
 
     private final TransferDao transferDao;
+    private final AccountDao accountDao;
     //Will add parameters to constructor when we get to authentication steps.
-    public TransferController(TransferDao transferDao) {
+    public TransferController(TransferDao transferDao, AccountDao accountDao) {
         this.transferDao = transferDao;
+        this.accountDao = accountDao;
     }
     @RequestMapping(method = RequestMethod.GET)
     public List<Transfer> transferList() {
          return transferDao.getTransfers();
 
     }
+    //@PreAuthorize("hasRole('USER')")
     @RequestMapping(path = "{transferId}", method = RequestMethod.GET)
     public Transfer getTransferById(@PathVariable int transferId) {
         //gets transfer by transferId
@@ -51,8 +56,27 @@ public class TransferController {
         //if status request is not to change to approve or reject, throw exception (bad request) (cannot change to pending)
         if(!status.equals("approve") && !status.equals("reject"))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transfers can only have their statuses changed to 'approve' or 'reject'");
+
+        Transfer transfer = transferDao.getTransferById(transferId);
+
+        // if status was approve move balance
+        if(status.equals("approve")) {
+            Account sourceAccount = accountDao.getAccountById(transfer.getFromAccountId());
+            Account targetAccount = accountDao.getAccountById(transfer.getToAccountId());
+
+            // if source account doesn't have enough money, reject transfer and bad request
+            if(transfer.getAmount().compareTo(sourceAccount.getBalance()) == 1){
+                transferDao.updateTransferStatus(transferId, 3);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough money in source account to complete transfer.");
+            }
+
+            accountDao.setAccountAmount(sourceAccount.getAccount_id(), sourceAccount.getBalance().subtract(transfer.getAmount()));
+            accountDao.setAccountAmount(targetAccount.getAccount_id(), targetAccount.getBalance().add(transfer.getAmount()));
+        }
+
         //after passing all if conditions, update the transfer status to 2 or 3 (see database table transfer_status)
         transferDao.updateTransferStatus(transferId, status.equals("approve") ? 2 : 3);
+
         //return transfer by transferId
         return transferDao.getTransferById(transferId);
     }

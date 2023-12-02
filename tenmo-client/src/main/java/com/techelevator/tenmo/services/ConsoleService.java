@@ -44,6 +44,8 @@ public class ConsoleService {
         System.out.println("3: View your pending requests");
         System.out.println("4: Send TE bucks");
         System.out.println("5: Request TE bucks");
+        System.out.println("6: Approve request");
+        System.out.println("7: Reject request");
         System.out.println("0: Exit");
         System.out.println();
     }
@@ -102,9 +104,9 @@ public class ConsoleService {
         }
     }
     public void printTransfers(Transfer[] transfers) {
-        System.out.println("--------------------------");
-        System.out.println(" ID   AMOUNT   STATUS");
-        System.out.println("--------------------------");
+        System.out.println("--------------------------------");
+        System.out.println(" ID   AMOUNT   TYPE   STATUS");
+        System.out.println("--------------------------------");
         if (transfers != null) {
             for (Transfer transfer : transfers) {
                 System.out.println(transfer.transferToString());

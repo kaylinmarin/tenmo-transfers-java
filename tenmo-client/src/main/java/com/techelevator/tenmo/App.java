@@ -4,6 +4,7 @@ import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 public class App {
 
@@ -13,7 +14,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final AccountService accountService = new AccountService();
     private final UserService userService = new UserService();
-    private final TransferService transferService = new TransferService();
+    private final TransferService transferService = new TransferService(accountService);
 
     private AuthenticatedUser currentUser;
 
@@ -61,6 +62,11 @@ public class App {
         if (currentUser == null) {
             consoleService.printErrorMessage();
         }
+        else {
+            // user has just logged in, set auth tokens on services
+            accountService.setAuthToken(currentUser.getToken());
+            transferService.setAuthToken(currentUser.getToken());
+        }
     }
 
     private void mainMenu() {
@@ -79,7 +85,11 @@ public class App {
                 sendBucks();
             } else if (menuSelection == 5) {
                 requestBucks();
-            } else if (menuSelection == 0) {
+            } else if (menuSelection == 6) {
+                approveTransfer();
+            } else if  (menuSelection == 7) {
+                rejectTransfer();
+            }else if (menuSelection == 0) {
                 continue;
             } else {
                 System.out.println("Invalid Selection");
@@ -113,12 +123,17 @@ public class App {
 
 	}
 
-	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
+    private Transfer[] getPendingTransfers() {
         int currentUserId = currentUser.getUser().getId();
         int currentAccountId = accountService.getAccountByUserId(currentUserId).getAccount_id();
-        Transfer[] completedTransfers = transferService.getPendingTransfers(currentAccountId);
-        consoleService.printTransfers(completedTransfers);
+        Transfer[] transfers = transferService.getPendingTransfers(currentAccountId);
+        return transfers;
+    }
+
+	private void viewPendingRequests() {
+		// TODO Auto-generated method stub
+        Transfer[] transfers = getPendingTransfers();
+        consoleService.printTransfers(transfers);
 	}
 
 	private void sendBucks() {
@@ -230,6 +245,60 @@ public class App {
         }
         else System.out.println("Transfer pending.");
 
+    }
+    private void approveTransfer() {
+        viewPendingRequests();
+        int transferId = consoleService.promptForInt("Please select the request id you would like to approve: ");
+        Transfer[] validTransfers = getPendingTransfers();
+        boolean isValid = false;
+        // write a loop over the valid transfers
+        for (Transfer validTransfer: validTransfers) {
+            //  if transfer id matches the valid transfer id, set is valid to true
+            if (transferId == validTransfer.getId()) {
+                isValid = true;
+            }
+        }
+        // after loop: if is valid is false, exit
+        if(!isValid) {
+            System.out.println("Invalid id. Please make another selection.");
+            return;
+        }
+        // otherwise we can make the transfer approval call
+        boolean wasSuccessful = transferService.approveTransfer(transferId);
+        if (wasSuccessful) {
+            System.out.println("Request approved!");
+        }
+        else {
+            System.out.println("Request failed");
+        }
+    }
+    private void rejectTransfer() {
+        viewPendingRequests();
+        int transferId = consoleService.promptForInt("Please select the request id you would like to reject: ");
+        Transfer[] validTransfers = getPendingTransfers();
+        boolean isValid = false;
+        // write a loop over the valid transfers
+        for (Transfer validTransfer: validTransfers) {
+            //  if transfer id matches the valid transfer id, set is valid to true
+            if (transferId == validTransfer.getId()) {
+                isValid = true;
+            }
+        }
+
+        // after loop: if is valid is false, exit
+        if(!isValid) {
+            System.out.println("Invalid id. Please make another selection.");
+            return;
+        }
+
+        // otherwise we can make the transfer approval call
+        boolean wasSuccessful = transferService.rejectTransfer(transferId);
+        if (wasSuccessful) {
+            System.out.println("Request rejected!");
+        }
+        else {
+            System.out.println("Request failed");
+        }
     }
 
 }

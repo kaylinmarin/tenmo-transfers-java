@@ -12,7 +12,9 @@ public class Transfer {
     private int statusId;
 
     public String transferToString() {
+        //use a switch
         String statusName = null;
+        String transferType = null;
             if (statusId == 1) {
                 statusName = "PENDING";
             }
@@ -22,7 +24,13 @@ public class Transfer {
             if (statusId == 3) {
                 statusName = "REJECTED";
             }
-            return id + "  " + amount + "  " + statusName;
+            if (typeId == 1) {
+                transferType = "REQUESTED";
+            }
+            if (typeId == 2) {
+                transferType = "SENT";
+            }
+            return id +  "  $" + amount + "  " + transferType + "  " + statusName;
     }
 
     public int getId() {

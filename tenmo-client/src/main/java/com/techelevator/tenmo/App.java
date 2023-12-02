@@ -147,15 +147,26 @@ public class App {
          transfer.setToUserId(targetAccount.getAccount_id());
          transfer.setAmount(amount);
 
+        //boolean if successful print approved
+        //if not, print rejected
          Transfer createdTransfer = transferService.createTransfer(transfer);
          if (createdTransfer != null && createdTransfer.getId() > 0){
              System.out.println("transfer success");
          } else {
              System.out.println("no transfer for you");
          }
-         //boolean if successful print approved
-         //if not, print rejected
 
+         // logic to move money between accounts
+        // get currentUser account (already captured in currentUserAccount)
+        // get the target user account (captured in targetAccount)
+        // check if current account has valid balance
+        if(amount.compareTo(currentUserAccount.getBalance()) == -1){
+            accountService.subtractTransferAmount(currentUserAccount.getBalance());
+        }
+
+        // if valid, move money between accounts
+        // if not enough, set the transfer status to rejected
+        // if successful, call transferService.updateTransferStatus
 	}
 
 	private void requestBucks() {
@@ -186,9 +197,20 @@ public class App {
 
          Transfer transfer = new Transfer();
          transfer.setTypeId(1);
-         transfer.setToUserId(currentUser.getUser().getId());
-         transfer.setFromUserId(selection);
-         transfer.setAmount(amount);
+        transfer.setStatusId(1);
+//         transfer.setFromUserId(currentUser.getUser().getId());
+        Account currentUserAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
+        Account targetAccount = accountService.getAccountByUserId(selection);
+        transfer.setToUserId(currentUserAccount.getAccount_id());
+        transfer.setFromUserId(targetAccount.getAccount_id());
+        transfer.setAmount(amount);
+
+        Transfer createdTransfer = transferService.createTransfer(transfer);
+        if (createdTransfer != null && createdTransfer.getId() > 0){
+            System.out.println("request successfully sent");
+        } else {
+            System.out.println("no request for you");
+        }
 
     }
     //where to update account balances after transfer amount?

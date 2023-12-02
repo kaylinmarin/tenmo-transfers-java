@@ -8,7 +8,7 @@ public class TransferService {
     public String API_BASE_URL = "http://localhost:8080/transfers/";
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Transfer createTransfer(Transfer transfer){
+    public Transfer createTransfer(Transfer transfer) {
         ResponseEntity<Transfer> newTransfer = restTemplate.postForEntity(API_BASE_URL, transfer, Transfer.class);
         return newTransfer.getBody();
     }

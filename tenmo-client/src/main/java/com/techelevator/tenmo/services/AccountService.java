@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
@@ -8,10 +9,12 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AccountService {
+    private AuthenticatedUser currentUser;
 
     public String API_BASE_URL = "http://localhost:8080/accounts/";
 
@@ -48,5 +51,8 @@ public class AccountService {
     }
 
 
-
+    public BigDecimal subtractTransferAmount(BigDecimal transferAmount) {
+        BigDecimal getNewBalance = currentUser.getBalance -= transferAmount;
+        return subtractTransferAmount(getNewBalance);
+    }
 }

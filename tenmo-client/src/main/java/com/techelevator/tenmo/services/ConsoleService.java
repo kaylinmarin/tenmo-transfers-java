@@ -90,7 +90,7 @@ public class ConsoleService {
         System.out.println("An error occurred. Check the log for details.");
     }
     public void printUsers(User[] users) {
-        //ask austin about printing users without current user included
+        //how to exclude current user?
         if (users != null) {
             System.out.println("--------------------------");
             System.out.println("ID      User");
@@ -102,6 +102,9 @@ public class ConsoleService {
         }
     }
     public void printTransfers(Transfer[] transfers) {
+        System.out.println("--------------------------");
+        System.out.println(" ID   AMOUNT   STATUS");
+        System.out.println("--------------------------");
         if (transfers != null) {
             for (Transfer transfer : transfers) {
                 System.out.println(transfer.transferToString());

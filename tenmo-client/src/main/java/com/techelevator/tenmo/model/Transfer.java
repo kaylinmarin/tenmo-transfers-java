@@ -12,7 +12,17 @@ public class Transfer {
     private int statusId;
 
     public String transferToString() {
-        return id + "  " + amount;
+        String statusName = null;
+            if (statusId == 1) {
+                statusName = "PENDING";
+            }
+            if (statusId == 2) {
+                statusName = "APPROVED";
+            }
+            if (statusId == 3) {
+                statusName = "REJECTED";
+            }
+            return id + "  " + amount + "  " + statusName;
     }
 
     public int getId() {

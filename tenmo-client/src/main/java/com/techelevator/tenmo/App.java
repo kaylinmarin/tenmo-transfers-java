@@ -1,10 +1,7 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.*;
-import com.techelevator.tenmo.services.AccountService;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
-import com.techelevator.tenmo.services.UserService;
+import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
 
@@ -16,6 +13,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final AccountService accountService = new AccountService();
     private final UserService userService = new UserService();
+    private final TransferService transferService = new TransferService();
 
     private AuthenticatedUser currentUser;
 
@@ -141,10 +139,20 @@ public class App {
 
          Transfer transfer = new Transfer();
          transfer.setTypeId(2);
-         transfer.setFromUserId(currentUser.getUser().getId());
-         transfer.setToUserId(selection);
+         transfer.setStatusId(1);
+//         transfer.setFromUserId(currentUser.getUser().getId());
+         Account currentUserAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
+         transfer.setFromUserId(currentUserAccount.getAccount_id());
+         Account targetAccount = accountService.getAccountByUserId(selection);
+         transfer.setToUserId(targetAccount.getAccount_id());
          transfer.setAmount(amount);
 
+         Transfer createdTransfer = transferService.createTransfer(transfer);
+         if (createdTransfer != null && createdTransfer.getId() > 0){
+             System.out.println("transfer success");
+         } else {
+             System.out.println("no transfer for you");
+         }
          //boolean if successful print approved
          //if not, print rejected
 

@@ -41,7 +41,12 @@ public class JdbcTransferDao implements TransferDao {
         String sql = "INSERT INTO transfer (transfer_status_id, transfer_type_id, account_from, account_to, amount) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id ";
 
-        int newTransferId = jdbcTemplate.queryForObject(sql, int.class, transfer.getStatusId(), transfer.getTypeId(), transfer.getFromAccountId(), transfer.getToAccountId(), transfer.getAmount());
+        int newTransferId = jdbcTemplate.queryForObject(sql, int.class,
+                transfer.getStatusId(),
+                transfer.getTypeId(),
+                transfer.getFromAccountId(),
+                transfer.getToAccountId(),
+                transfer.getAmount());
         transfer.setId(newTransferId);
         return transfer;
     }

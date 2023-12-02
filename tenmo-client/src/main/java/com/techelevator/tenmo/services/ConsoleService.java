@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
@@ -100,4 +101,13 @@ public class ConsoleService {
             System.out.println(" ");
         }
     }
+    public void printTransfers(Transfer[] transfers) {
+        if (transfers != null) {
+            for (Transfer transfer : transfers) {
+                System.out.println(transfer.transferToString());
+            }
+
+        }
+    }
+
 }

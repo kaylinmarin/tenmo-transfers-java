@@ -68,6 +68,7 @@ public class App {
         while (menuSelection != 0) {
             consoleService.printMainMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
+
             if (menuSelection == 1) {
                 viewCurrentBalance();
             } else if (menuSelection == 2) {
@@ -103,12 +104,21 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
+        int currentUserId = currentUser.getUser().getId();
+        int currentAccountId = accountService.getAccountByUserId(currentUserId).getAccount_id();
+        Transfer[] completedTransfers = transferService.getCompletedTransfers(currentAccountId);
+        consoleService.printTransfers(completedTransfers);
+
+
 
 	}
 
 	private void viewPendingRequests() {
 		// TODO Auto-generated method stub
-		
+        int currentUserId = currentUser.getUser().getId();
+        int currentAccountId = accountService.getAccountByUserId(currentUserId).getAccount_id();
+        Transfer[] completedTransfers = transferService.getPendingTransfers(currentAccountId);
+        consoleService.printTransfers(completedTransfers);
 	}
 
 	private void sendBucks() {
@@ -116,57 +126,61 @@ public class App {
         User[] users = userService.getAllUsers();
         consoleService.printUsers(userService.getAllUsers());
 
-        int selection = consoleService.promptForInt("Enter Id of user you are sending to (Select 0 to cancel): ");
-        if (selection == 0) {
+        int selectedUserId = consoleService.promptForInt("Enter Id of user you are sending to (Select 0 to cancel): ");
+        if (selectedUserId == 0) {
            return;
         }
-         if (selection == currentUser.getUser().getId()) {
+         if (selectedUserId == currentUser.getUser().getId()) {
            System.out.println("Invalid selection: Cannot transfer to yourself.");
            return;
          }
-         //everything is catching here. Need to resolve grabbing account by user id
-        //maybe I need account Id, not user id. to retrieve the account?
-         if (accountService.getAccountByUserId(selection) == null) {
+
+         Account targetAccount = accountService.getAccountByUserId(selectedUserId);
+         if (targetAccount == null) {
            System.out.println("Invalid user id.");
            return;
          }
 
+         // notes on BigDecimal.compareTo(BigDecimal):
+        // BigDecimal cannot use conventional comparison operators (<, <=, ==, >, >=)
+        // so, we have to use compareTo
+        // compareTo is an oldschool comparison function
+        // the way these work, is they have two values, left and right, that they compare
+        // left is the value you called compareTo on, right is the value you passed to compareTo
+        // compareTo returns one of three numbers, indicating the result of the comparison
+        // -1 means the left number was LESS THAN the right number
+        // 0 means the left number was EQUAL TO the right number
+        // 1 means the left number was GREATER THAN the right number
+        // so, for a comparison like >=, you would need to check if the result is equal to 0 or 1
+        // alternatively, test the opposite; check if the result is not equal to -1
          BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to send $");
+
          if (amount.compareTo(new BigDecimal("0")) == -1 || amount.compareTo(new BigDecimal("0")) == 0 ) {
              System.out.println("Invalid amount. Must be more than $0.00");
              return;
          }
+        Account sourceAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
+        if (sourceAccount.getBalance().compareTo(amount) == -1 ) {
+            System.out.println("Insufficient funds to transfer.");
+        }
 
          Transfer transfer = new Transfer();
          transfer.setTypeId(2);
-         transfer.setStatusId(1);
-//         transfer.setFromUserId(currentUser.getUser().getId());
-         Account currentUserAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
-         transfer.setFromUserId(currentUserAccount.getAccount_id());
-         Account targetAccount = accountService.getAccountByUserId(selection);
-         transfer.setToUserId(targetAccount.getAccount_id());
+         transfer.setFromAccountId(sourceAccount.getAccount_id());
+         transfer.setToAccountId(targetAccount.getAccount_id());
          transfer.setAmount(amount);
+         transfer.setStatusId(2);
 
-        //boolean if successful print approved
-        //if not, print rejected
-         Transfer createdTransfer = transferService.createTransfer(transfer);
-         if (createdTransfer != null && createdTransfer.getId() > 0){
-             System.out.println("transfer success");
-         } else {
-             System.out.println("no transfer for you");
+         Transfer result = transferService.create(transfer);
+         if (result == null) {
+             System.out.println("Transfer rejected.");
          }
+         else System.out.println("Transfer successful.");
 
-         // logic to move money between accounts
-        // get currentUser account (already captured in currentUserAccount)
-        // get the target user account (captured in targetAccount)
-        // check if current account has valid balance
-        if(amount.compareTo(currentUserAccount.getBalance()) == -1){
-            accountService.subtractTransferAmount(currentUserAccount.getBalance());
-        }
 
-        // if valid, move money between accounts
-        // if not enough, set the transfer status to rejected
-        // if successful, call transferService.updateTransferStatus
+         //boolean if successful print approved
+         //if not, print rejected
+
 	}
 
 	private void requestBucks() {
@@ -174,45 +188,48 @@ public class App {
         User[] users = userService.getAllUsers();
         consoleService.printUsers(userService.getAllUsers());
 
-        int selection = consoleService.promptForInt("Enter Id of user you would like to request from (Select 0 to cancel): ");
-        if (selection == 0) {
+        int selectedUserId = consoleService.promptForInt("Enter Id of user you would like to request from (Select 0 to cancel): ");
+        if (selectedUserId == 0) {
             return;
         }
-        if (selection == currentUser.getUser().getId()) {
+
+        if (selectedUserId == currentUser.getUser().getId()) {
             System.out.println("Invalid selection: Cannot transfer to yourself.");
             return;
         }
-        //everything is catching here. Need to resolve grabbing account by user id
-        //maybe I need account Id, not user id. to retrieve the account?
-        if (accountService.getAccountByUserId(selection) == null) {
+        if (accountService.getAccountByUserId(selectedUserId) == null) {
             System.out.println("Invalid user id.");
             return;
         }
 
-        BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to request");
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to request: $");
         if (amount.compareTo(new BigDecimal("0")) == -1 || amount.compareTo(new BigDecimal("0")) == 0 ) {
             System.out.println("Invalid amount. Must be more than $0.00");
             return;
         }
+        Account sourceAccount = accountService.getAccountByUserId(selectedUserId);
+        if (sourceAccount == null) {
+            System.out.println("Invalid user id.");
+            return;
+        }
+        Account targetAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
+
+
+        // fetch from and to accounts using account service and user ids
 
          Transfer transfer = new Transfer();
          transfer.setTypeId(1);
-        transfer.setStatusId(1);
-//         transfer.setFromUserId(currentUser.getUser().getId());
-        Account currentUserAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
-        Account targetAccount = accountService.getAccountByUserId(selection);
-        transfer.setToUserId(currentUserAccount.getAccount_id());
-        transfer.setFromUserId(targetAccount.getAccount_id());
-        transfer.setAmount(amount);
+         transfer.setFromAccountId(sourceAccount.getAccount_id());
+         transfer.setToAccountId(targetAccount.getAccount_id());
+         transfer.setAmount(amount);
+         transfer.setStatusId(1);
 
-        Transfer createdTransfer = transferService.createTransfer(transfer);
-        if (createdTransfer != null && createdTransfer.getId() > 0){
-            System.out.println("request successfully sent");
-        } else {
-            System.out.println("no request for you");
+        Transfer result = transferService.create(transfer);
+        if (result == null) {
+            System.out.println("Transfer rejected.");
         }
+        else System.out.println("Transfer pending.");
 
     }
-    //where to update account balances after transfer amount?
 
 }

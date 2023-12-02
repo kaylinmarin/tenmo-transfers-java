@@ -1,15 +1,12 @@
 package com.techelevator.dao;
 
-import com.techelevator.tenmo.dao.JdbcUserDao;
 import com.techelevator.tenmo.exception.DaoException;
 import com.techelevator.tenmo.model.RegisterUserDto;
 import com.techelevator.tenmo.model.User;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 
@@ -18,12 +15,12 @@ public class JdbcUserDaoTests extends BaseDaoTests {
     protected static final User USER_2 = new User(1002, "user2", "user2", "USER");
     private static final User USER_3 = new User(1003, "user3", "user3", "USER");
 
-    private JdbcUserDao sut;
+    private JdbcUserDao1 sut;
 
     @Before
     public void setup() {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        sut = new JdbcUserDao(jdbcTemplate);
+        sut = new JdbcUserDao1(jdbcTemplate);
     }
 
     @Test(expected = IllegalArgumentException.class)

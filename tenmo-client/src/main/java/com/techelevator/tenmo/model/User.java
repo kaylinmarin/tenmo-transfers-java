@@ -20,6 +20,7 @@ public class User {
     }
     public String userToString() {
         return id + "    " + username;
+
     }
 
     public void setUsername(String username) {

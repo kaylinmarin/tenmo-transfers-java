@@ -1,5 +1,7 @@
 package com.techelevator.tenmo.model;
 
+import com.techelevator.tenmo.services.UserService;
+
 import java.math.BigDecimal;
 
 public class Transfer {
@@ -10,6 +12,7 @@ public class Transfer {
     private BigDecimal amount;
     private int typeId;
     private int statusId;
+    private final UserService userService = new UserService();
 
     public String transferToString() {
         //use a switch
@@ -30,7 +33,8 @@ public class Transfer {
             if (typeId == 2) {
                 transferType = "SENT";
             }
-            return id +  "  $" + amount + "  " + transferType + "  " + statusName;
+            return String.format("%-5d $%-8.2f %-10s %-15s", id, amount, transferType, statusName);
+
     }
 
     public int getId() {

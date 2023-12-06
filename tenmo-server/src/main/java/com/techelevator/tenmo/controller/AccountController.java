@@ -36,7 +36,7 @@ public class AccountController {
         List<Account> accounts = accountDao.getAccounts();
         return accounts;
     }
-   // @PreAuthorize("hasRole('USER')")
+
     @RequestMapping(path = "{accountId}", method = RequestMethod.GET)
     public Account getAccountById(@PathVariable int accountId) {
         Account account = accountDao.getAccountById(accountId);

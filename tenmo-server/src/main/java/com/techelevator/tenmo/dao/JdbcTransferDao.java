@@ -41,30 +41,23 @@ public class JdbcTransferDao implements TransferDao {
     public Transfer createTransfer(Transfer transfer) {
         String sql = "INSERT INTO transfer (transfer_status_id, transfer_type_id, account_from, account_to, amount) " +
                 "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id ";
-    try {
+        try {
+            // if the transfer type is send, move the money right away
+            if (transfer.getTypeId() == 2) {
+                //  get both accounts using AccountDao
+                Account sourceAccount = accountDao.getAccountById(transfer.getFromAccountId());
+                Account targetAccount = accountDao.getAccountById(transfer.getToAccountId());
 
-    // if the transfer type is send, move the money right away
-        if (transfer.getTypeId() == 2) {
-        //  get both accounts using AccountDao
-            Account sourceAccount = accountDao.getAccountById(transfer.getFromAccountId());
-            Account targetAccount = accountDao.getAccountById(transfer.getToAccountId());
-
-            accountDao.setAccountAmount(sourceAccount.getAccount_id(), sourceAccount.getBalance().subtract(transfer.getAmount()));
-            accountDao.setAccountAmount(targetAccount.getAccount_id(), targetAccount.getBalance().add(transfer.getAmount()));
-
+                accountDao.setAccountAmount(sourceAccount.getAccount_id(), sourceAccount.getBalance().subtract(transfer.getAmount()));
+                accountDao.setAccountAmount(targetAccount.getAccount_id(), targetAccount.getBalance().add(transfer.getAmount()));
         }
-    //  adjust money in both accounts
-    //  update both accounts using AccountDao
-    // otherwise, transfer is a request, don't need to do anything
-
-    int newTransferId = jdbcTemplate.queryForObject(sql, int.class, transfer.getStatusId(), transfer.getTypeId(), transfer.getFromAccountId(), transfer.getToAccountId(), transfer.getAmount());
-    transfer.setId(newTransferId);
-
-}
-catch(Exception e)
-{
-    System.out.println(e.toString());
-}
+            int newTransferId = jdbcTemplate.queryForObject(sql, int.class, transfer.getStatusId(), transfer.getTypeId(), transfer.getFromAccountId(), transfer.getToAccountId(), transfer.getAmount());
+             transfer.setId(newTransferId);
+        }
+        catch(Exception e)
+        {
+            System.out.println(e.toString());
+        }
         return transfer;
     }
 
@@ -95,44 +88,32 @@ catch(Exception e)
     @Override
     public List<Transfer> getCompletedTransfersByAccountId(int accountId) {
         // write sql to get all transfers that have:
+        //  a to or from account id matching the account id above
+        //  and are in rejected or approved status
         String sql = "SELECT * FROM transfer " +
                 "WHERE ? in (account_from, account_to) " +
                 "AND transfer_status_id <> 1; ";
-        //   a to or from account id matching the account id above
-        //   and are in rejected or approved status
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
         List<Transfer> transfers = new ArrayList<>();
         while (results.next()) {
             transfers.add(mapRowToTransfer(results));
         }
-
-        // declare transfers list
-        // convert sql row results to transfer objects
-        // add each transfer to the transfers list
-
-        // return the list
         return transfers;
     }
 
     @Override
     public List<Transfer> getPendingTransfersByAccountId(int accountId) {
         // write sql to get all transfers that have:
+        //   a to or from account id matching the account id above
+        //   and are in rejected or approved status
         String sql = "SELECT * FROM transfer " +
                 "WHERE ? in (account_from, account_to) " +
                 "AND transfer_status_id = 1; ";
-        //   a to or from account id matching the account id above
-        //   and are in rejected or approved status
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId);
         List<Transfer> transfers = new ArrayList<>();
         while (results.next()) {
             transfers.add(mapRowToTransfer(results));
         }
-
-        // declare transfers list
-        // convert sql row results to transfer objects
-        // add each transfer to the transfers list
-
-        // return the list
         return transfers;
     }
 
@@ -145,6 +126,5 @@ catch(Exception e)
         transfer.setToAccountId(sr.getInt("account_to"));
         transfer.setAmount(sr.getBigDecimal("amount"));
         return transfer;
-
     }
 }

@@ -74,7 +74,6 @@ public class JdbcAccountDao implements AccountDao {
         jdbcTemplate.update(sql, amount, accountId);
     }
 
-
     private Account mapRowToAccount(SqlRowSet rs) {
         Account account = new Account();
         account.setAccount_id(rs.getInt("account_id"));

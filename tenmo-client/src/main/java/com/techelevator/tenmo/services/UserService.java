@@ -37,13 +37,6 @@ public class UserService {
         return user;
     }
 
-    private HttpEntity<User> makeUserEntity(User user) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(authToken);
-        return new HttpEntity<>(user, headers);
-    }
-
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authToken);

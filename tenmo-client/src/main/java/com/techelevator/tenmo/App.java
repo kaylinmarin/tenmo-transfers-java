@@ -105,10 +105,6 @@ public class App {
         accountService.setAuthToken(currentUser.getToken());
         Account account = accountService.getAccountByUserId(userId);
         System.out.println("The current balance is : $" + account.getBalance());
-
-
-    // TODO Auto-generated method stub
-
 }
 
 
@@ -118,9 +114,6 @@ public class App {
         int currentAccountId = accountService.getAccountByUserId(currentUserId).getAccount_id();
         Transfer[] completedTransfers = transferService.getCompletedTransfers(currentAccountId);
         consoleService.printTransfers(completedTransfers);
-
-
-
 	}
 
     private Transfer[] getPendingTransfers() {
@@ -149,25 +142,23 @@ public class App {
            System.out.println("Invalid selection: Cannot transfer to yourself.");
            return;
          }
-
          Account targetAccount = accountService.getAccountByUserId(selectedUserId);
          if (targetAccount == null) {
            System.out.println("Invalid user id.");
            return;
          }
-
          // notes on BigDecimal.compareTo(BigDecimal):
-        // BigDecimal cannot use conventional comparison operators (<, <=, ==, >, >=)
-        // so, we have to use compareTo
-        // compareTo is an oldschool comparison function
-        // the way these work, is they have two values, left and right, that they compare
-        // left is the value you called compareTo on, right is the value you passed to compareTo
-        // compareTo returns one of three numbers, indicating the result of the comparison
-        // -1 means the left number was LESS THAN the right number
-        // 0 means the left number was EQUAL TO the right number
-        // 1 means the left number was GREATER THAN the right number
-        // so, for a comparison like >=, you would need to check if the result is equal to 0 or 1
-        // alternatively, test the opposite; check if the result is not equal to -1
+         // BigDecimal cannot use conventional comparison operators (<, <=, ==, >, >=)
+         // so, we have to use compareTo
+         // compareTo is an oldschool comparison function
+         // the way these work, is they have two values, left and right, that they compare
+         // left is the value you called compareTo on, right is the value you passed to compareTo
+         // compareTo returns one of three numbers, indicating the result of the comparison
+         // -1 means the left number was LESS THAN the right number
+         // 0 means the left number was EQUAL TO the right number
+         // 1 means the left number was GREATER THAN the right number
+         // so, for a comparison like >=, you would need to check if the result is equal to 0 or 1
+         // alternatively, test the opposite; check if the result is not equal to -1
          BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount you would like to send $");
 
          if (amount.compareTo(new BigDecimal("0")) == -1 || amount.compareTo(new BigDecimal("0")) == 0 ) {
@@ -191,11 +182,6 @@ public class App {
              System.out.println("Transfer rejected.");
          }
          else System.out.println("Transfer successful.");
-
-
-         //boolean if successful print approved
-         //if not, print rejected
-
 	}
 
 	private void requestBucks() {
@@ -229,9 +215,7 @@ public class App {
         }
         Account targetAccount = accountService.getAccountByUserId(currentUser.getUser().getId());
 
-
         // fetch from and to accounts using account service and user ids
-
          Transfer transfer = new Transfer();
          transfer.setTypeId(1);
          transfer.setFromAccountId(sourceAccount.getAccount_id());
@@ -244,8 +228,8 @@ public class App {
             System.out.println("Transfer rejected.");
         }
         else System.out.println("Transfer pending.");
-
     }
+
     private void approveTransfer() {
         viewPendingRequests();
         int transferId = consoleService.promptForInt("Please select the request id you would like to approve: ");
@@ -271,6 +255,7 @@ public class App {
         else {
             System.out.println("Request failed");
         }
+
     }
     private void rejectTransfer() {
         viewPendingRequests();
@@ -284,13 +269,11 @@ public class App {
                 isValid = true;
             }
         }
-
         // after loop: if is valid is false, exit
         if(!isValid) {
             System.out.println("Invalid id. Please make another selection.");
             return;
         }
-
         // otherwise we can make the transfer approval call
         boolean wasSuccessful = transferService.rejectTransfer(transferId);
         if (wasSuccessful) {

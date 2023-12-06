@@ -104,12 +104,14 @@ public class ConsoleService {
         }
     }
     public void printTransfers(Transfer[] transfers) {
-        System.out.println("--------------------------------");
-        System.out.println(" ID   AMOUNT   TYPE   STATUS");
-        System.out.println("--------------------------------");
+        System.out.println("-------------------------------------");
+        System.out.println(" ID   AMOUNT    TYPE     STATUS");
+        System.out.println("-------------------------------------");
+        System.out.println(" ");
         if (transfers != null) {
             for (Transfer transfer : transfers) {
                 System.out.println(transfer.transferToString());
+
             }
 
         }

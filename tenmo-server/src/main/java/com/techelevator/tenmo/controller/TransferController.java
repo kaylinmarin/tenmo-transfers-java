@@ -24,9 +24,8 @@ public class TransferController {
     @RequestMapping(method = RequestMethod.GET)
     public List<Transfer> transferList() {
          return transferDao.getTransfers();
-
     }
-    //@PreAuthorize("hasRole('USER')")
+
     @RequestMapping(path = "{transferId}", method = RequestMethod.GET)
     public Transfer getTransferById(@PathVariable int transferId) {
         //gets transfer by transferId
@@ -69,14 +68,11 @@ public class TransferController {
                 transferDao.updateTransferStatus(transferId, 3);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough money in source account to complete transfer.");
             }
-
             accountDao.setAccountAmount(sourceAccount.getAccount_id(), sourceAccount.getBalance().subtract(transfer.getAmount()));
             accountDao.setAccountAmount(targetAccount.getAccount_id(), targetAccount.getBalance().add(transfer.getAmount()));
         }
-
         //after passing all if conditions, update the transfer status to 2 or 3 (see database table transfer_status)
         transferDao.updateTransferStatus(transferId, status.equals("approve") ? 2 : 3);
-
         //return transfer by transferId
         return transferDao.getTransferById(transferId);
     }

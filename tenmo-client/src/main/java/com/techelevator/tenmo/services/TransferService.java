@@ -27,7 +27,6 @@ public class TransferService {
     }
 
     public TransferService(AccountService accountService) {
-
         this.accountService = accountService;
     }
 
@@ -85,7 +84,6 @@ public class TransferService {
         }
         return true;
     }
-
 
     public void setAuthToken(String authToken) {
         this.authToken = authToken;
